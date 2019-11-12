@@ -1,0 +1,111 @@
+---
+# tasks file for users
+
+# Context
+# -------
+# The context section is used to load variables. This has been built in a specific order so that subsequent variable files override earlier variables.
+# This generates a specicifity very similar to what we see in Chef.
+# The order is as follows:
+#  - OS Family (i.e: Debian, RedHat)
+#  - Distribution (i.e: RedHat Enterprise, CentOS, Ubuntu)
+#  - LSB name (i.e: Raspbian) - only applicable to Debian-based OS's, and primarily needed to support Raspbian on Raspberry Pi's as its the only place Raspbian is specified
+#  - Distribution-Version (i.e: Debian-10)
+#  - Hostname (as specificed in inventory file)
+#  - Hostname (as read by Ansible)
+#  - IP Address
+
+# Remember these are CASE SENSITIVE
+
+
+# This deals with family-specific variabiles. Store them in /var/family/___.yml
+- name: Load OS family specific variables file
+  include_vars:
+    file: "context/family/{{ansible_os_family}}.yml" # RedHat.yml
+  ignore_errors: true
+
+
+# This deals with os-specific variabiles. Store them in /var/os/___.yml
+- name: Load os specific variables file
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "context/os/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml" # Debian-10.yml
+    - "context/os/{{ ansible_lsb.id }}.yml" # Raspbian.yml
+    - "context/os/{{ ansible_distribution }}.yml" # RedHat.yml
+  ignore_errors: true
+
+
+# This deals with host-specific variabiles. Store them in /var/host/___.yml
+- name: Load host specific variables file
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "context/host/{{ ansible_default_ipv4.address }}.yml" # 10.0.0.10.yml
+    - "context/host/{{ ansible_hostname }}.yml" # pxe.yml
+    - "context/host/{{ inventory_hostname }}.yml" # pxe.yml
+  ignore_errors: true
+
+
+# We load these in blocks to that we dont have to copy every single varialbe into files with a higher specicity.
+# Remember:
+#   - Variables in more specific files completely overwrite variables loaded before it.
+#   - Variables do not concatonate. You must specify the whole variable again.
+# -------
+
+- name: Determine local user accounts
+  getent:
+    database: passwd
+
+
+- name: Add sudo users
+  user:
+    name: "{{item.username}}"
+    password: "{{item.password}}"
+    shell: /bin/bash
+    groups: "{{sudo_grp}}"
+    append: yes
+    state: present
+    update_password: on_create
+  with_items: "{{users_present}}"
+  when: item.sudo == True and item.enabled == True
+
+
+- name: Add non sudo users
+  user:
+    name: "{{item.username}}"
+    password: "{{item.password}}"
+    shell: /bin/bash
+    groups: ''
+    append: yes
+    state: present
+    update_password: on_create
+  with_items: "{{users_present}}"
+  when: item.sudo == False and item.enabled == True
+
+
+- name: Add authorized key
+  authorized_key:
+    user: "{{item.username}}"
+    state: present
+    key: "{{item.rsa}}"
+  with_items: "{{users_present}}"
+  when: item.enabled == True and item.rsa != ""
+
+
+- name: Disable users
+  user:
+    name: "{{item.username}}"
+    password: "{{item.password}}"
+    shell: /bin/false
+    groups: ''
+    append: yes
+    state: present
+    update_password: on_create
+  with_items: "{{users_present}}"  
+  when: item.sudo == False and item.enabled == True
+
+
+- name: Delete accounts
+  user:
+    name: "{{item.username}}"
+    state: absent
+  with_items: "{{users_absent}}"
+  when: users_absent is defined and item in ansible_facts.getent_passwd

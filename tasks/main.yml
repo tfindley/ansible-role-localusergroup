@@ -34,16 +34,6 @@
   ignore_errors: true
 
 
-# This deals with host-specific variabiles. Store them in /var/host/___.yml
-- name: Load host specific variables file
-  include_vars: "{{ item }}"
-  with_first_found:
-    - "context/host/{{ ansible_default_ipv4.address }}.yml" # 10.0.0.10.yml
-    - "context/host/{{ ansible_hostname }}.yml" # pxe.yml
-    - "context/host/{{ inventory_hostname }}.yml" # pxe.yml
-  ignore_errors: true
-
-
 # We load these in blocks to that we dont have to copy every single varialbe into files with a higher specicity.
 # Remember:
 #   - Variables in more specific files completely overwrite variables loaded before it.
@@ -52,7 +42,25 @@
 
 - name: Determine local user accounts
   getent:
+    database: group
+
+- name: Determine local user accounts
+  getent:
     database: passwd
+
+- name: Add groups
+  group:
+    name: "{{item}}"
+    state: present
+  with_items: "{{groups_present}}"
+  when: groups_present is defined
+
+- name: Delete groups
+  group:
+    name: "{{item}}"
+    state: absent
+  with_items: "{{groups_absent}}"
+  when: groups_absent is defined and item in ansible_facts.getent_group
 
 
 - name: Add sudo users
@@ -60,7 +68,7 @@
     name: "{{item.username}}"
     password: "{{item.password}}"
     shell: /bin/bash
-    groups: "{{sudo_grp}}"
+    groups: "{{sudo_grp}},{{item.groups}}"
     append: yes
     state: present
     update_password: on_create
@@ -73,7 +81,7 @@
     name: "{{item.username}}"
     password: "{{item.password}}"
     shell: /bin/bash
-    groups: ''
+    groups: '{{item.groups}}'
     append: yes
     state: present
     update_password: on_create

@@ -29,11 +29,18 @@ Including an example of how to use your role (for instance, with variables passe
       roles:
         - role: '/home/tristan/ansible/roles_vss/users'
       vars:
+
+        groups_present:
+        - "ansible"
+    
+        groups_absent:
+        - "group_to_delete
+
         users_present:
-        - {username: user1,  sudo: True,     enabled: True,    fname: User,     sname: One,     email: user1@ansible.com,         password: EncryptedPasswordUser1, rsa: "https://github.com/user1.keys" }
-        - {username: user2,  sudo: True,     enabled: True,    fname: User,     sname: Two,     email: user2@ansible.com,         password: EncryptedPasswordUser2, rsa: "ssh-rsa enteryourrpublickeystringhere user2@usersmachine.local" }
-        - {username: user3,  sudo: True,     enabled: False,   fname: User,     sname: Three,   email: user3@ansible.com,         password: EncryptedPasswordUser3, rsa: }
-        - {username: user4,  sudo: False,    enabled: True,    fname: User,     sname: Four,    email: user4@ansible.com,         password: EncryptedPasswordUser4, rsa: "user2_id_rsa.pub"}
+        - {username: user1,  sudo: True,     enabled: True,    fname: User,     sname: One,     groups: "ansible",       email: user1@ansible.com,         password: EncryptedPasswordUser1, rsa: "https://github.com/user1.keys" }
+        - {username: user2,  sudo: True,     enabled: True,    fname: User,     sname: Two,     groups: "ansible",       email: user2@ansible.com,         password: EncryptedPasswordUser2, rsa: "ssh-rsa enteryourrpublickeystringhere user2@usersmachine.local" }
+        - {username: user3,  sudo: True,     enabled: False,   fname: User,     sname: Three,   groups: "ansible",       email: user3@ansible.com,         password: EncryptedPasswordUser3, rsa: }
+        - {username: user4,  sudo: False,    enabled: True,    fname: User,     sname: Four,    groups: "ansible",       email: user4@ansible.com,         password: EncryptedPasswordUser4, rsa: "user2_id_rsa.pub"}
 
         users_absent: 
         - "user5"

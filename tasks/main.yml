@@ -20,7 +20,7 @@
 # This deals with family-specific variabiles. Store them in /var/family/___.yml
 - name: Load OS family specific variables file
   include_vars:
-    file: "context/family/{{ansible_os_family}}.yml" # RedHat.yml
+    file: "context/family/{{ ansible_os_family }}.yml" # RedHat.yml
   ignore_errors: true
 
 
@@ -50,70 +50,82 @@
 
 - name: Add groups
   group:
-    name: "{{item}}"
+    name: "{{ item }}"
     state: present
-  with_items: "{{groups_present}}"
+  with_items: "{{ groups_present }}"
   when: groups_present is defined
 
 - name: Delete groups
   group:
-    name: "{{item}}"
+    name: "{{ item }}"
     state: absent
-  with_items: "{{groups_absent}}"
-  when: groups_absent is defined and item in ansible_facts.getent_group
+  with_items: "{{ groups_absent }}"
+  when:
+    - groups_absent is defined
+    - item in ansible_facts.getent_group
 
 
 - name: Add sudo users
   user:
-    name: "{{item.username}}"
-    password: "{{item.password}}"
+    name: "{{ item.username }}"
+    password: "{{ item.password }}"
     shell: /bin/bash
-    groups: "{{sudo_grp}},{{item.groups}}"
+    groups: "{{ sudo_grp }},{{ item.groups }}"
     append: yes
     state: present
     update_password: on_create
-  with_items: "{{users_present}}"
-  when: item.sudo == True and item.enabled == True
+  with_items: "{{ users_present }}"
+  when:
+    - item.sudo
+    - item.enabled
 
 
 - name: Add non sudo users
   user:
-    name: "{{item.username}}"
-    password: "{{item.password}}"
+    name: "{{ item.username }}"
+    password: "{{ item.password }}"
     shell: /bin/bash
-    groups: '{{item.groups}}'
+    groups: '{{ item.groups }}'
     append: yes
     state: present
     update_password: on_create
-  with_items: "{{users_present}}"
-  when: item.sudo == False and item.enabled == True
+  with_items: "{{ users_present }}"
+  when:
+    - not item.sudo
+    - item.enabled
 
 
 - name: Add authorized key
   authorized_key:
-    user: "{{item.username}}"
+    user: "{{ item.username }}"
     state: present
-    key: "{{item.rsa}}"
-  with_items: "{{users_present}}"
-  when: item.enabled == True and item.rsa != ""
-
+    key: "{{ item.rsa }}"
+  with_items: "{{ users_present }}"
+  when:
+    - item.enabled
+    - item.rsa is defined
+    - item.rsa | length > 0
 
 - name: Disable users
   user:
-    name: "{{item.username}}"
-    password: "{{item.password}}"
+    name: "{{ item.username }}"
+    password: "{{ item.password }}"
     shell: /bin/false
     groups: ''
     append: yes
     state: present
     update_password: on_create
-  with_items: "{{users_present}}"  
-  when: item.sudo == False and item.enabled == True
+  with_items: "{{ users_present }}"
+  when:
+    - not item.sudo
+    - item.enabled
 
 
 - name: Delete accounts
   user:
-    name: "{{item.username}}"
+    name: "{{ item.username }}"
     state: absent
-  with_items: "{{users_absent}}"
-  when: users_absent is defined and item in ansible_facts.getent_passwd
+  with_items: "{{ users_absent }}"
+  when:
+    - users_absent is defined
+    - item in ansible_facts.getent_passwd

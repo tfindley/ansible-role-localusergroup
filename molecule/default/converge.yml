@@ -8,9 +8,15 @@
   vars:
     users_present:
     # python -c 'import crypt; print crypt.crypt("This is my Password", "$1$SomeSalt$")'
-    - {username: test,  sudo: True,     enabled: True,    fname: Test,     sname: User,     groups: "testing",     email: testing@somewhere.com,         password: $1$221ArhSo$xQyiyPcFa19g7YQDM5CUM., rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAhNFonYNb7t5xD0b/6OjnRdj3ZfEpBVQrn6lijAl5MIjQTy9WZdIPrLf+TaZOZFce5EbcosLX/9iItl31Xc0La1RpUa1A7nM272AFRaZ+ULygLpRcuc2S3iOhIIKmnOQ261Y9MB9yNA+BQmYf3hPZ2tveoVohrVCk6SdaFHyqS+uQ6SKVx1MEVDssnXtcS09jbMbsEL0oV1nSJ/bgdzDCIOE/RIBanKZA4BuhAo8cWYRWDCjmxqlFsMX8oP88wBGgq2O/s93wF9LIR2jFszXoO0siF9B2To0zd3GyzOJfNRKjL6qTxQLtGYsJG8rz4W++7uNT2OMTYiQvSSJmp8SOjw== testsshkey" }
+    - {username: test,          sudo: True,     enabled: True,    fname: Test,     sname: User,     groups: "testing",     email: testing@somewhere.com,         password: $1$221ArhSo$xQyiyPcFa19g7YQDM5CUM., rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAhNFonYNb7t5xD0b/6OjnRdj3ZfEpBVQrn6lijAl5MIjQTy9WZdIPrLf+TaZOZFce5EbcosLX/9iItl31Xc0La1RpUa1A7nM272AFRaZ+ULygLpRcuc2S3iOhIIKmnOQ261Y9MB9yNA+BQmYf3hPZ2tveoVohrVCk6SdaFHyqS+uQ6SKVx1MEVDssnXtcS09jbMbsEL0oV1nSJ/bgdzDCIOE/RIBanKZA4BuhAo8cWYRWDCjmxqlFsMX8oP88wBGgq2O/s93wF9LIR2jFszXoO0siF9B2To0zd3GyzOJfNRKjL6qTxQLtGYsJG8rz4W++7uNT2OMTYiQvSSJmp8SOjw== testsshkey" } # noqa 204
+    - {username: deletemeuser,  sudo: True,     enabled: True,    fname: Test,     sname: User,     groups: "testing",     email: deleteme@somewhere.com,        password: $1$221ArhSo$xQyiyPcFa19g7YQDM5CUM., rsa: "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAhNFonYNb7t5xD0b/6OjnRdj3ZfEpBVQrn6lijAl5MIjQTy9WZdIPrLf+TaZOZFce5EbcosLX/9iItl31Xc0La1RpUa1A7nM272AFRaZ+ULygLpRcuc2S3iOhIIKmnOQ261Y9MB9yNA+BQmYf3hPZ2tveoVohrVCk6SdaFHyqS+uQ6SKVx1MEVDssnXtcS09jbMbsEL0oV1nSJ/bgdzDCIOE/RIBanKZA4BuhAo8cWYRWDCjmxqlFsMX8oP88wBGgq2O/s93wF9LIR2jFszXoO0siF9B2To0zd3GyzOJfNRKjL6qTxQLtGYsJG8rz4W++7uNT2OMTYiQvSSJmp8SOjw== testsshkey" } # noqa 204
+
+    users_absent:
+    - "deletemeuser"
 
     groups_present:
     - "testing"
-    
+    - "deletemegroup"
+
     groups_absent:
+    - "deletemegroup"

@@ -123,7 +123,7 @@
 
 - name: Delete accounts
   user:
-    name: "{{ item.username }}"
+    name: "{{ item }}"
     state: absent
   with_items: "{{ users_absent }}"
   when:

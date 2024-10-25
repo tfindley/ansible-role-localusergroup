@@ -1,2 +1,10 @@
 ---
 # vars file for users
+
+_usersandgroups_sudo_group_logic:
+  Debian:
+    - 'sudo'
+    - 'adm'
+  RedHat:
+    - 'wheel'
+usersandgroups_sudo_group: "{{ _usersandgroups_sudo_group_logic[ansible_os_family] }}"

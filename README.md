@@ -1,14 +1,24 @@
-# Users and Groups
+# Local Users and Groups
 
-A brief description of the role goes here.
+This is a very basic role for managing users and groups on a local Linux system
 
 ## Requirements
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+This role has no requirements beyond that of Ansible
 
 ## Role Variables
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+| field    | type   | required | default value | example          | description |
+| -------- | ------ | -------- | ------------- | ---------------- | ----------- |
+| username | string | true     |               | present / absent |             |
+| state    | string | true     |               |                  |             |
+| fname    | string | true     |               |                  |             |
+| sname    | string | true     |               |                  |             |
+| email    | string | true     |               |                  |             |
+| password | string | true     |               |                  |             |
+| sudo     | bool   | false    | false         | true             |             |
+| groups   | list   | false    |               |                  |             |
+| sshkeys  | list   | false    |               |                  |             |
 
 ## Dependencies
 
@@ -20,15 +30,8 @@ A list of other roles hosted on Galaxy should go here, plus any details in regar
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
 ```yml
-- hosts: servers
-  become: yes
-  gather_facts: true
-  roles:
-    - role: 'usersandgroups'
-  vars:
-
-# Adding a user
-  - username: "username"
+localusergroup_users:
+  - username: "username"  # This user will be added
     state: present
     fname: "user"
     sname: "name"
@@ -40,16 +43,17 @@ Including an example of how to use your role (for instance, with variables passe
     sshkeys:
       - 'copypaste ssh key'
       - 'or use file read'
+      - 'multiple_keys_can_be_used'
 
-# Removing a user
-  - username: "another.user"
+  - username: "another.user"  # This user will be removed
     state: absent
 
 # Managing Groups
-usersandgroups_groups:
-  - name: "dcinfra"
+localusergroup_groups:
+  - name: "infra"  # This group will be added
     state: present
 ```
+
 
 ### Generate password
 
@@ -70,4 +74,11 @@ BSD
 
 ## Author Information
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+
+**Tristan Findley**
+
+Find out more about me [here](https://tfindley.github.io).
+
+If you're fan of my work and would like to show your support:
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Z8Z016573P)

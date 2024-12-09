@@ -1,46 +1,49 @@
 ---
 # tasks file for users
 
-- name: Fetch local user accounts
+- name: "LocalUserGroup - Fetch local user accounts"
   become: true
   ansible.builtin.getent:
     database: group
 
-- name: Fetch local user accounts
+- name: "LocalUserGroup - Fetch local user accounts"
   become: true
   ansible.builtin.getent:
     database: passwd
 
-- name: "Manage groups"
+- name: "LocalUserGroup - Manage groups"
   become: true
-  loop: "{{ usersandgroups_groups }}"
+  ignore_errors: "{{ true if item.state == 'absent' else false }}"   # because idempotency is difficult with this module
+  loop: "{{ localusergroup_groups }}"
   loop_control:
     label: "{{ item.name }} - {{ item.state }}"
   when:
-    - usersandgroups_groups is defined
+    - localusergroup_groups is defined
   ansible.builtin.group:
     name: "{{ item.name }}"
     state: "{{ item.state }}"
 
-- name: "Manage users"
+- name: "LocalUserGroup - Manage users"
   become: true
-  loop: "{{ usersandgroups_users }}"
+  ignore_errors: "{{ true if item.state == 'absent' else false }}"   # because idempotency is difficult with this module
+  loop: "{{ localusergroup_users }}"
   loop_control:
     label: "{{ item.username }} - {{ item.state }}"
   when:
-    - usersandgroups_users
+    - localusergroup_users
   ansible.builtin.user:
     name: "{{ item.username }}"
     password: "{{ item.password if item.state == 'present' else omit }}"
     shell: "{{ item.shell | default('/bin/bash') if item.state == 'present' else omit }}"
-    groups: "{{ (item.groups | default([])) + (usersandgroups_sudo_group if item.sudo else []) if item.state == 'present' else omit }}"
+    groups: "{{ (item.groups | default([])) + (localusergroup_sudo_group if item.sudo else []) if item.state == 'present' else omit }}"
     append: "{{ true if item.state == 'present' else omit }}"
     state: "{{ item.state }}"
     update_password: "{{ 'on_create' if item.state == 'present' else omit }}"
 
-- name: "Manage authorized keys"
+- name: "LocalUserGroup - Manage authorized keys"
   become: true
-  loop: "{{ usersandgroups_users | selectattr('sshkeys', 'defined') | subelements('sshkeys') }}"
+  ignore_errors: "{{ ansible_check_mode }}"
+  loop: "{{ localusergroup_users | selectattr('sshkeys', 'defined') | subelements('sshkeys') }}"
   loop_control:
     label: "{{ item.0.username }}"
   when:

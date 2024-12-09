@@ -8,10 +8,12 @@ This role has no requirements beyond that of Ansible
 
 ## Role Variables
 
+**localusergroup_users** - list of dictionaries containing the following
+
 | field    | type   | required | default value | example          | description |
 | -------- | ------ | -------- | ------------- | ---------------- | ----------- |
-| username | string | true     |               | present / absent |             |
-| state    | string | true     |               |                  |             |
+| username | string | true     |               |                  |             |
+| state    | string | true     |               | present / absent |             |
 | fname    | string | true     |               |                  |             |
 | sname    | string | true     |               |                  |             |
 | email    | string | true     |               |                  |             |
@@ -19,6 +21,14 @@ This role has no requirements beyond that of Ansible
 | sudo     | bool   | false    | false         | true             |             |
 | groups   | list   | false    |               |                  |             |
 | sshkeys  | list   | false    |               |                  |             |
+
+**localusergroup_groups** - list of dictionaries containing the following
+
+| field    | type   | required | default value | example          | description |
+| -------- | ------ | -------- | ------------- | ---------------- | ----------- |
+| name     | string | true     |               |                  |             |
+| state    | string | true     |               | present / absent |             |
+
 
 ## Dependencies
 
